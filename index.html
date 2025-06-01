@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Senhas Secretas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      background: #181818;
+      color: #ededed;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .container {
+      background: #222;
+      padding: 2em 2.5em 2em 2.5em;
+      border-radius: 16px;
+      box-shadow: 0 4px 32px #0005;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 320px;
+      max-width: 480px;
+    }
+    .title {
+      letter-spacing: 2px;
+      font-size: 1.3em;
+      margin-bottom: 1em;
+      text-align: center;
+      font-weight: 600;
+      min-height: 1.8em;
+    }
+    .pw-label {
+      display: none;
+    }
+    .pw-input {
+      width: 100%;
+      padding: 0.7em;
+      background: #1a1a1a;
+      color: #fff;
+      border: 1.5px solid #444;
+      border-radius: 7px;
+      font-size: 1em;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .pw-input:focus {
+      border-color: #ff9800;
+    }
+    .submit-btn, .choice-btn {
+      margin-top: 1.2em;
+      background: #ff9800;
+      border: none;
+      color: #181818;
+      font-size: 1.1em;
+      font-weight: 700;
+      padding: 0.7em 1.3em;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      margin-right: 0.7em;
+    }
+    .submit-btn:active, .choice-btn:active {
+      background: #e07c00;
+    }
+    .choice-btn:last-child {
+      margin-right: 0;
+    }
+    .choice-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 1em;
+      width: 100%;
+      align-items: center;
+      margin-top: 1.4em;
+      margin-bottom: 0.8em;
+    }
+    .choice-row {
+      display: flex;
+      gap: 1.2em;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .midiabtn {
+      background: #ff9800;
+      color: #181818;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      padding: 0.5em 1.3em;
+      cursor: pointer;
+      margin-bottom: 1em;
+      font-size: 1.08em;
+      display: inline-block;
+      transition: background 0.15s;
+    }
+    .midiabtn:active {
+      background: #e07c00;
+    }
+    .close-btn {
+      position: absolute;
+      top: 0.85em;
+      right: 1.2em;
+      background: none;
+      border: none;
+      color: #ff9800;
+      font-size: 1.5em;
+      cursor: pointer;
+      font-weight: bold;
+      line-height: 1;
+    }
+    .modal-bg {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.65);
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.25s;
+    }
+    .modal-bg.active {
+      display: flex;
+    }
+    .modal {
+      background: #222;
+      color: #ededed;
+      border-radius: 16px;
+      box-shadow: 0 2px 32px #000a;
+      padding: 2em 1.8em 1.8em 1.8em;
+      min-width: 260px;
+      max-width: 90vw;
+      max-height: 84vh;
+      overflow-y: auto;
+      text-align: center;
+      position: relative;
+      animation: popIn 0.22s;
+    }
+    .modal-title {
+      margin: 0 0 1.2em 0;
+      font-size: 1.2em;
+      font-weight: 600;
+    }
+    .links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.7em;
+      align-items: center;
+      margin-bottom: 1.4em;
+    }
+    .modal-link {
+      background: #272727;
+      color: #ff9800;
+      text-decoration: none;
+      padding: 0.5em 1.3em;
+      border-radius: 7px;
+      font-weight: 600;
+      font-size: 1.06em;
+      transition: background 0.13s, color 0.13s;
+      display: inline-block;
+    }
+    .modal-link:hover {
+      background: #ff9800;
+      color: #181818;
+    }
+    .fade-message {
+      color: #ff9800;
+      font-size: 1.14em;
+      font-weight: 600;
+      margin-top: 1.8em;
+      min-height: 2em;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.6s;
+    }
+    .final-message {
+      color: #ffe066;
+      font-size: 1.13em;
+      font-weight: 600;
+      margin-top: 2.2em;
+      margin-bottom: 2.7em;
+      text-align:center;
+      max-width: 550px;
+      line-height: 1.5;
+      letter-spacing: 0.01em;
+    }
+    .umbra-btn {
+      background: #6a30cf;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      padding: 0.7em 1.6em;
+      cursor: pointer;
+      font-size: 1.07em;
+      margin-bottom: 1.2em;
+      margin-top: 2.7em;
+      transition: background 0.18s;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1;}
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.95);}
+      to { opacity: 1; transform: scale(1);}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="mainTitle" class="title">Dependentia</div>
+    <form id="pwForm" autocomplete="off" style="width:100%;">
+      <input id="pwInput" class="pw-input" type="password" required maxlength="32" autocomplete="off" placeholder="ensira a senha" autofocus />
+      <button type="submit" class="submit-btn">Enviar</button>
+    </form>
+    <button id="midiabtn" class="midiabtn" style="display:none;">+</button>
+    <div id="fadeMsg" class="fade-message" style="display:none;"></div>
+    <div id="choiceArea" style="display:none;"></div>
+    <div id="finalMsg" class="final-message" style="display:none;">
+      Anu retornou à terra e plantou a raiz retorcida. No mesmo segundo, o Sol nasceu no horizonte pela primeira vez, criando luz. Uma vez que cresceu, o Sol se pôs e a Lua tomou seu lugar, definindo as trevas. Duas crianças passaram a residir naquela árvore, Kyden, a luz, e Norea, as trevas.
+    </div>
+    <a id="umbraBtn" href="https://imgur.com/a/zRc4VNi" target="_blank" class="umbra-btn" style="display:none;">Umbra</a>
+  </div>
+  <!-- Modal dos links -->
+  <div id="modalBg" class="modal-bg">
+    <div class="modal">
+      <button class="close-btn" id="closeModalBtn" title="Fechar">&times;</button>
+      <div class="modal-title">Mídias</div>
+      <div class="links-list" id="linksList"></div>
+    </div>
+  </div>
+  <script>
+    // Títulos
+    const TITULOS = [
+      "Dependentia", "Linea", "Caelum", "Aptus", "Fidelitas"
+    ];
+    // Senhas iniciais e links
+    const SENHAS = [
+      {
+        pw: 'opium',
+        link: {
+          url: 'https://imgur.com/7MMKEWv',
+          label: 'indescritível'
+        }
+      },
+      {
+        pw: 'epinoia',
+        link: {
+          url: 'https://www.youtube.com/@epinoiatv',
+          label: 'tudo flui'
+        }
+      },
+      {
+        pw: 'anu',
+        link: {
+          url: 'https://imgur.com/a/reQS0AE',
+          label: 'inefável'
+        }
+      },
+      {
+        pw: 'finitude',
+        link: {
+          url: 'https://youtube.com/shorts/xbCZnkUJqHM?feature=share',
+          label: 'amor'
+        }
+      },
+      {
+        pw: 'ninfa',
+        link: {
+          url: 'https://imgur.com/a/4lbE4Ie',
+          label: 'Donzela'
+        }
+      }
+    ];
+
+    // Estado
+    let senhaAtual = 0;
+    let linksDesbloqueados = [];
+    let etapa = 'senhas'; // senhas | pausa | cebolas | selo | nome | fraqueza | sumiu | final
+    let pwForm = document.getElementById('pwForm');
+    let pwInput = document.getElementById('pwInput');
+    let mainTitle = document.getElementById('mainTitle');
+    let midiabtn = document.getElementById('midiabtn');
+    let fadeMsg = document.getElementById('fadeMsg');
+    let choiceArea = document.getElementById('choiceArea');
+    let finalMsg = document.getElementById('finalMsg');
+    let umbraBtn = document.getElementById('umbraBtn');
+
+    // Modal
+    const modalBg = document.getElementById('modalBg');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const linksList = document.getElementById('linksList');
+
+    // Modal functions
+    function showModal() {
+      linksList.innerHTML = '';
+      linksDesbloqueados.forEach((l) => {
+        let a = document.createElement('a');
+        a.href = l.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.className = 'modal-link';
+        a.textContent = l.label;
+        linksList.appendChild(a);
+      });
+      modalBg.classList.add('active');
+    }
+    function closeModal() {
+      modalBg.classList.remove('active');
+      setTimeout(() => {
+        if (document.activeElement) document.activeElement.blur();
+        if (etapa === 'senhas' || etapa === 'cebolas') pwInput.focus();
+      }, 100);
+    }
+    closeModalBtn.onclick = closeModal;
+    modalBg.onclick = function(e) {
+      if (e.target === modalBg) closeModal();
+    };
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Pausa após as 5 senhas
+    function pausaEspirito() {
+      etapa = 'pausa';
+      mainTitle.textContent = "";
+      pwForm.style.display = 'none';
+      midiabtn.style.display = 'none';
+      choiceArea.style.display = 'none';
+      fadeMsg.textContent = "Você retornará quando tiver mais Espírito";
+      fadeMsg.style.display = 'block';
+      setTimeout(() => {
+        fadeMsg.style.display = 'none';
+        etapaCebolas();
+      }, 1800);
+    }
+
+    // Solicita senha "Cebolas"
+    function etapaCebolas() {
+      etapa = 'cebolas';
+      mainTitle.textContent = "Já ouviu os áudios? A última palavra de um deles.";
+      pwForm.style.display = 'block';
+      pwInput.type = "password";
+      pwInput.value = "";
+      pwInput.placeholder = "ensira a senha";
+      midiabtn.style.display = 'inline-block';
+      choiceArea.style.display = 'none';
+      fadeMsg.style.display = 'none';
+      pwInput.focus();
+    }
+
+    // Selo: escolha
+    function etapaSelo() {
+      etapa = 'selo';
+      mainTitle.textContent = "Vamos jogar um jogo, selecione seu Selo.";
+      choiceArea.innerHTML = `
+        <div class="choice-row">
+          <button class="choice-btn" data-v="Carne">Carne</button>
+          <button class="choice-btn" data-v="Mente">Mente</button>
+          <button class="choice-btn" data-v="Matéria">Matéria</button>
+          <button class="choice-btn" data-v="Espírito">Espírito</button>
+          <button class="choice-btn" data-v="Natureza">Natureza</button>
+        </div>
+      `;
+      choiceArea.style.display = 'block';
+      pwForm.style.display = 'none';
+      fadeMsg.style.display = 'none';
+      addChoiceListeners('selo');
+    }
+
+    // Nome: escolha
+    function etapaNome() {
+      etapa = 'nome';
+      mainTitle.textContent = "Qual seu nome?";
+      choiceArea.innerHTML = `
+        <div class="choice-row">
+          <button class="choice-btn" data-v="Emi">Emi</button>
+          <button class="choice-btn" data-v="Kyden">Kyden</button>
+          <button class="choice-btn" data-v="Gael">Gael</button>
+          <button class="choice-btn" data-v="K'in">K'in</button>
+          <button class="choice-btn" data-v="Sol">Sol</button>
+        </div>
+      `;
+      choiceArea.style.display = 'block';
+      pwForm.style.display = 'none';
+      fadeMsg.style.display = 'none';
+      addChoiceListeners('nome');
+    }
+
+    // Fraqueza: escolha
+    function etapaFraqueza() {
+      etapa = 'fraqueza';
+      mainTitle.textContent = "Você tem uma fraqueza.";
+      choiceArea.innerHTML = `
+        <div class="choice-row">
+          <button class="choice-btn" data-v="Desamparo">Desamparo</button>
+          <button class="choice-btn" data-v="Ego">Ego</button>
+          <button class="choice-btn" data-v="Isolamento">Isolamento</button>
+          <button class="choice-btn" data-v="Paranormal">Paranormal</button>
+          <button class="choice-btn" data-v="Violência">Violência</button>
+        </div>
+      `;
+      choiceArea.style.display = 'block';
+      pwForm.style.display = 'none';
+      fadeMsg.style.display = 'none';
+      addChoiceListeners('fraqueza');
+    }
+
+    // Sumiu: escolha
+    function etapaSumiu() {
+      etapa = 'sumiu';
+      mainTitle.textContent = "Onde sumiu com Asterin";
+      choiceArea.innerHTML = `
+        <div class="choice-row">
+          <button class="choice-btn" data-v="Palácio do Sol">Palácio do Sol</button>
+          <button class="choice-btn" data-v="Templo da Lua de Sangue">Templo da Lua de Sangue</button>
+          <button class="choice-btn" data-v="Castelo da Alma">Castelo da Alma</button>
+          <button class="choice-btn" data-v="Porta">Porta</button>
+          <button class="choice-btn" data-v="Pirâmide">Pirâmide</button>
+        </div>
+      `;
+      choiceArea.style.display = 'block';
+      pwForm.style.display = 'none';
+      fadeMsg.style.display = 'none';
+      addChoiceListeners('sumiu');
+    }
+
+    // Adiciona listeners para os botões de escolha
+    function addChoiceListeners(etapaAtual) {
+      let btns = choiceArea.querySelectorAll('.choice-btn');
+      btns.forEach(btn => {
+        btn.onclick = function() {
+          let val = btn.getAttribute('data-v');
+          if (etapaAtual === 'selo') {
+            if (val === 'Espírito') etapaNome();
+            else respostaIncorreta();
+          } else if (etapaAtual === 'nome') {
+            if (val === 'Kyden') etapaFraqueza();
+            else respostaIncorreta();
+          } else if (etapaAtual === 'fraqueza') {
+            if (val === 'Desamparo') {
+              fadeMsg.textContent = "Você fugiu.";
+              fadeMsg.style.display = 'block';
+              choiceArea.style.display = 'none';
+              setTimeout(etapaSumiu, 1300);
+            } else respostaIncorreta();
+          } else if (etapaAtual === 'sumiu') {
+            if (val === 'Porta') etapaFinal();
+            else respostaIncorreta();
+          }
+        }
+      });
+    }
+
+    // Resposta incorreta nas escolhas
+    function respostaIncorreta() {
+      fadeMsg.textContent = "Resposta incorreta, reiniciando sistema.";
+      fadeMsg.style.display = 'block';
+      choiceArea.style.display = 'none';
+      setTimeout(() => {
+        etapaSelo();
+      }, 1400);
+    }
+
+    // Final
+    function etapaFinal() {
+      etapa = 'final';
+      mainTitle.textContent = "";
+      choiceArea.style.display = 'none';
+      fadeMsg.style.display = 'none';
+      finalMsg.style.display = 'block';
+      umbraBtn.style.display = 'block';
+    }
+
+    // Formulário senha inicial
+    pwForm.onsubmit = (e) => {
+      e.preventDefault();
+      let valor = pwInput.value.trim().toLowerCase();
+      if (etapa === 'senhas') {
+        if (senhaAtual < SENHAS.length && valor === SENHAS[senhaAtual].pw) {
+          if (SENHAS[senhaAtual].link) {
+            linksDesbloqueados.push(SENHAS[senhaAtual].link);
+          }
+          senhaAtual++;
+          if (senhaAtual === SENHAS.length) {
+            pausaEspirito();
+          } else {
+            mainTitle.textContent = TITULOS[senhaAtual];
+            pwInput.value = '';
+            midiabtn.style.display = senhaAtual > 0 ? 'inline-block' : 'none';
+            fadeMsg.style.display = 'none';
+          }
+        } else {
+          pwInput.value = '';
+        }
+      } else if (etapa === 'cebolas') {
+        if (valor === 'cebolas') {
+          etapaSelo();
+        } else {
+          pwInput.value = '';
+        }
+      }
+    };
+
+    // Botão mídias mostra o modal
+    midiabtn.onclick = function() {
+      showModal();
+    };
+
+    // Inicialização
+    mainTitle.textContent = TITULOS[0];
+    midiabtn.style.display = 'none';
+    fadeMsg.style.display = 'none';
+    choiceArea.style.display = 'none';
+    finalMsg.style.display = 'none';
+    umbraBtn.style.display = 'none';
+    pwInput.value = '';
+    pwInput.focus();
+  </script>
+</body>
+</html>
